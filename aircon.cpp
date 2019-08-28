@@ -81,107 +81,88 @@ DaikinAirConditioning::~DaikinAirConditioning(void)
   delete _pDaikinAircon;
 }
 
-
-int DaikinAirConditioning::GetStateFromString(std::map<int,std::string> &state, std::string &str)
+void DaikinAirConditioning::AppendSelection(std::map<int,std::string> &state, char *settingName, int selected, std::string &str)
 {
-  std::map<int,std::string>::iterator it; 
-  for(it=state.begin(); it!=state.end();it++)
-  {
-    if (it->second == str)
-    {
-      return it->first;
-    }
-  }
-  /* this should not happen */
-  return SELECTION_ERROR;
-}
-
-
-std::string * DaikinAirConditioning::GenerateSelection(std::map<int,std::string> &state, char *settingName, int selected)
-{
-  std::string *pRet= new std::string("<TD>");
-  pRet->append(settingName);
   char localConvertBuffer[10]= {0};
-  
-  pRet->append(":</TD><TD><select name=\"");
-  pRet->append(settingName);
-  pRet->append( "\">");
+  str.append("<div><label for=");
+  str.append(settingName);
+  str.append(" >");
+  str.append(settingName);
+  str.append("</label> <select name=\"");
+  str.append(settingName);
+  str.append( "\">");
 
   std::map<int,std::string>::iterator it;
 
   for (it=state.begin();it!=state.end();it++)
   {
-    pRet->append("<option ");
+    str.append("<option ");
       if (it->first == selected)
       {
-         pRet->append("selected ");
+         str.append("selected ");
       }
-      pRet->append("value = ");
+      str.append("value = ");
       itoa (it->first,localConvertBuffer,10);
-      pRet->append(localConvertBuffer);
-      pRet->append(" > ");
-      pRet->append(it->second);
-      pRet->append("</option>");
+      str.append(localConvertBuffer);
+      str.append(" > ");
+      str.append(it->second);
+      str.append("</option>");
   }
-  pRet->append("</select></TD>");
-
-  return pRet;
+  str.append("</select></div>");
 }
 
-std::string* DaikinAirConditioning::GenerateFanSelection(void)
+void DaikinAirConditioning::AppendFanSelection(std::string &str)
 {
-  return GenerateSelection( _FanSpeedStates, "Fan speed",_fan);
+  AppendSelection( _FanSpeedStates, "Fan speed",_fan, str);
 }
 
-std::string* DaikinAirConditioning::GenerateProgramSelection(void)
+void DaikinAirConditioning::AppendProgramSelection(std::string &str)
 {
-  return GenerateSelection(_ProgramStates, "Mode",_programMode);
+  AppendSelection(_ProgramStates, "Mode",_programMode, str);
 }
 
-std::string* DaikinAirConditioning::GeneratePowerSelection(void)
+void DaikinAirConditioning::AppendPowerSelection(std::string &str)
 {
-  return GenerateSelection(_OnOffStates, "Power",_power);
+  AppendSelection(_OnOffStates, "Power",_power,str);
 }
 
-std::string* DaikinAirConditioning::GeneratePowerfulSelection(void)
+void DaikinAirConditioning::AppendPowerfulSelection(std::string &str)
 {
-  return GenerateSelection(_OnOffStates, "Powerful",_powerful);
+  AppendSelection(_OnOffStates, "Powerful",_powerful,str);
 }
 
-std::string* DaikinAirConditioning::GenerateSwingSelection(void)
+void DaikinAirConditioning::AppendSwingSelection(std::string &str)
 {
-  return GenerateSelection(_OnOffStates, "Vertical swing",_swingVertical);
+  AppendSelection(_OnOffStates, "Vertical swing",_swingVertical,str);
 }
 
-std::string* DaikinAirConditioning::GenerateQuietSelection(void)
+void DaikinAirConditioning::AppendQuietSelection(std::string &str)
 {
-  return GenerateSelection(_OnOffStates, "Quiet",_quiet);
+  AppendSelection(_OnOffStates, "Quiet",_quiet, str);
 }
 
-std::string* DaikinAirConditioning::GenerateTemperatureSelection(void)
+void DaikinAirConditioning::AppendTemperatureSelection(std::string &str)
 {
-  std::string *pRet= new std::string("<TD>Temperature:</TD><TD><select name=\"Temperature\">");
+  str.append("<div>Temperature: <select name=\"Temperature\">");
   char localConvertBuffer[10]= {0};
   
   for (int i = DAIKIN_MIN_TEMP; i <= DAIKIN_MAX_TEMP; i++)
   {
-    pRet->append("<option ");
+    str.append("<option ");
     if (i == _temperature)
     {
-       pRet->append("selected ");
+       str.append("selected ");
     }
 
-    pRet->append("value = ");
+    str.append("value = ");
     itoa (i,localConvertBuffer,10);
-    pRet->append(localConvertBuffer);
-    pRet->append(">");
-    pRet->append(localConvertBuffer);
+    str.append(localConvertBuffer);
+    str.append(">");
+    str.append(localConvertBuffer);
        
-    pRet->append(" </option>");
+    str.append(" </option>");
   }
-  pRet->append("</select></TD>");
-
-  return pRet;
+  str.append("</select></div>");
 }
 
 
@@ -291,45 +272,26 @@ void DaikinAirConditioning::ProcessWebCommand(ESP8266WebServer *pWebServer)
   SendAirConditioningCommand();
 }
 
-std::string *DaikinAirConditioning::GenerateWebData(void)
+void DaikinAirConditioning::AppendWebData(std::string &str)
 {
-  std::string *pWebData = new std::string("<form method=\"POST\" action=\"command\"><TABLE><TR><TD>");
-
   /* add name */
-  pWebData->append(_actuatorName);
-  pWebData->append("<BR><BR> Mqtt state ");
-  pWebData->append(_stateTopic);
-  pWebData->append("<BR> Mqtt set ");
-  pWebData->append(_setTopic);
-  pWebData->append("<BR><BR></TR><TR>");
-  std::string *pSelection = GeneratePowerSelection();
-  pWebData->append(*pSelection);
-  delete pSelection;
-  pWebData->append("</TR><TR>");
-  pSelection = GenerateTemperatureSelection();
-  pWebData->append(*pSelection);
-  delete pSelection;
-  pWebData->append("</TR><TR>");
-  pSelection = GenerateProgramSelection();
-  pWebData->append(*pSelection);
-  delete pSelection;
-  pWebData->append("</TR><TR>");
-  pSelection = GenerateFanSelection();
-  pWebData->append(*pSelection);
-  delete pSelection;
-  pWebData->append("</TR><TR>");
-  pSelection = GeneratePowerfulSelection();
-  pWebData->append(*pSelection);
-  delete pSelection;
-  pWebData->append("</TR><TR>");
-  pSelection = GenerateQuietSelection();
-  pWebData->append(*pSelection);
-  delete pSelection;
-  pWebData->append("</TR><TR>");
-  pSelection = GenerateSwingSelection();
-  pWebData->append(*pSelection);
-  delete pSelection;
-  pWebData->append("</TR></TABLE><TR><BR><input type=\"submit\"></form></TD></TR></TABLE>");
-  return pWebData;
+  str.append("<div class=SAparagraph>");
+  str.append(_actuatorName);
+  str.append("<BR><BR>Mqtt state: ");
+  str.append(_stateTopic);
+  str.append("<BR> Mqtt set: ");
+  str.append(_setTopic);
+  str.append("</div></TD></TR><TR><TD>");
+
+  str.append("<form method=\"POST\" action=\"command\">");
+  AppendPowerSelection(str);
+  AppendTemperatureSelection(str);
+  AppendProgramSelection(str);
+  AppendFanSelection(str);
+  AppendPowerfulSelection(str);
+  AppendQuietSelection(str);
+  AppendSwingSelection(str);
+  str.append("<div><BR><input type=\"submit\"></div></form>");
+
 }
   

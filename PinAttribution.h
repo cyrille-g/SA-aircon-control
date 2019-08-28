@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ******************************************************************************/
 
-
 #ifndef _CGE_PIN_ATTRIBUTION_H
 #define _CGE_PIN_ATTRIBUTION_H
 
@@ -49,12 +48,12 @@ class PinAttribution
   void ProcessMqttRequest(char *topic, char* message);
   void ProcessWebRequest(ESP8266WebServer *pWebServer);
   
-  std::string *GenerateWebData(void);
+  void AppendWebData(std::string &str);
   void UpdateAllSensors(void);
   
   private:
-  std::queue<int> _pinToScanActuators;/* IR led is on D2, DHT sensor on D5 */
-  std::queue<int> _pinToScanSensors; /* IR led is on D2, DHT sensor on D5 */
+  std::queue<int> _pinToScanActuators; 
+  std::queue<int> _pinToScanSensors;
 
   int _onboardLedState;
   

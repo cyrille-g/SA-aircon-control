@@ -22,19 +22,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ******************************************************************************/
 
-
-
 #include "LocalNetwork.h"
 #include "PinAttribution.h"
+#include "parameters.h"
 
-/********************************** SETUP ****************************************/
-void setup(void) {
-
+void setup(void) 
+{
   // serial
   Serial.begin(115200);
-
-  allSensorsAndActuators.begin();
+  parameters.begin();
   network.begin();
+
+  //search sensors and actuators 
+  allSensorsAndActuators.begin();
+  
   //led off once setup is done
   digitalWrite(BUILTIN_LED,HIGH);
 
@@ -47,13 +48,20 @@ void loop() {
    *  The reason for that is the OTA update; when it happens, no other 
    *  function should run to avoid problems.
    *  To that end, a private boolean member in LocalNetwork is set.
-   *  Every function has to exit immediately when that member is set
+   *  Every function has to exit immediately when that member is set.
+   *  
+   *  the esp8266 specific code is mostly written in the LocalNetwork class, 
+   *  so this is the class to change to make it work on an arduino or any other MCU
    */
-  network.CheckWifi();
-  network.CheckOtaUpdate();
 
-  network.CheckAndProcessMqttEvents();
+  
+  if (network.CheckWifi())
+  {
+    network.CheckOtaUpdate();
+    network.CheckAndProcessMqttEvents();
+    network.ProcessNtpEvents();
+  }
+
   network.ProcessWebServerEvents();
-  network.ProcessNtpEvents();
   
 }

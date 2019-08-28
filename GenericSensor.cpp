@@ -27,6 +27,8 @@ SOFTWARE.
 #include "settings.h" 
 #include "DHTSensor.h"
 #include "DS18Sensor.h"
+
+#include "settings.h"
 #include <LogManagement.h>
 
 std::list<GenericSensor *> GenericSensor::FindSensors(int pin)

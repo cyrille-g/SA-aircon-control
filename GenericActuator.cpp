@@ -22,20 +22,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ******************************************************************************/
 
-
 #include "inttypes.h"
 #include "pins_arduino.h"
 
 #include "GenericActuator.h"
+
 #include "aircon.h"
 
+#include "settings.h"
+#include <LogManagement.h>
 
-std::list<GenericActuator *> GenericActuator::FindActuators(int pin)
+bool GenericActuator::SubscribeToMqttSetTopic(PubSubClient &mqttClient)
+{
+  if (_setTopic != "")
+  {
+    return mqttClient.subscribe(_setTopic.c_str());
+  } else {
+    return false;
+  }
+}
+
+/* define your actuator finders here. example:
+std::list<GenericActuator *> GenericActuator::FindAircon(int pin)
 {
   std::list<GenericActuator *> ret;
-    ret = FindAircon(pin);
+  if (pin == D2)
+  {
+    DaikinAirConditioning *pAircon = new DaikinAirConditioning(D2);
+    ret.push_front((GenericActuator *)pAircon);
+  }
   return ret;
 }
+*/
 
 std::list<GenericActuator *> GenericActuator::FindAircon(int pin)
 {
@@ -48,12 +66,15 @@ std::list<GenericActuator *> GenericActuator::FindAircon(int pin)
   return ret;
 }
 
-bool GenericActuator::SubscribeToMqttSetTopic(PubSubClient &mqttClient)
+
+std::list<GenericActuator *> GenericActuator::FindActuators(int pin)
 {
-  if (_setTopic != "")
-  {
-    return mqttClient.subscribe(_setTopic.c_str());
-  } else {
-    return false;
-  }
+  std::list<GenericActuator *> ret;
+  
+/* call your actuator finders here. example:
+  
+  ret.merge(FindAircon(pin));
+*/
+  ret.merge(FindAircon(pin));
+  return ret;
 }

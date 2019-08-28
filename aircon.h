@@ -30,11 +30,14 @@ SOFTWARE.
 #include <list>
 #include <string.h>
 #include <PubSubClient.h>
+
 #include "settings.h"
 
 #include "GenericActuator.h"
 
 #define SELECTION_ERROR 0xFF
+
+
 
 class DaikinAirConditioning : public GenericActuator
 {
@@ -42,20 +45,12 @@ class DaikinAirConditioning : public GenericActuator
     DaikinAirConditioning(int pin);
     ~DaikinAirConditioning();
 
-    std::string *GenerateFanSelection(void);
-    std::string *GenerateProgramSelection(void);
-    std::string *GenerateTemperatureSelection(void);
-    std::string *GeneratePowerSelection(void);
-    std::string *GeneratePowerfulSelection(void);
-    std::string *GenerateSwingSelection(void);
-    std::string *GenerateQuietSelection(void);
-
     void SendAirConditioningCommand(void);
 
     /* virtual implementations */
     void PublishMqttState(PubSubClient &mqttClient);
     bool ProcessMqttCommand(char* message);
-    std::string *GenerateWebData(void);
+    void AppendWebData(std::string &str);
     void ProcessWebCommand(ESP8266WebServer *pWebServer);
 
 
@@ -74,9 +69,16 @@ class DaikinAirConditioning : public GenericActuator
     std::map<int, std::string> _FanSpeedStates;
     std::map<int, std::string> _ProgramStates;
     std::map<int, std::string> _OnOffStates;
+   
+    void AppendSelection(std::map<int, std::string> &state, char *settingName, int selected,std::string &str);
 
-    int GetStateFromString( std::map<int, std::string> &state, std::string &str);
-    std::string *GenerateSelection(std::map<int, std::string> &state, char *settingName, int selected);
+    void AppendFanSelection(std::string &str);
+    void AppendProgramSelection(std::string &str);
+    void AppendTemperatureSelection(std::string &str);
+    void AppendPowerSelection(std::string &str);
+    void AppendPowerfulSelection(std::string &str);
+    void AppendSwingSelection(std::string &str);
+    void AppendQuietSelection(std::string &str);
 
 };
 

@@ -38,7 +38,7 @@ typedef enum
 
 class GenericActuator {
   public:
-    virtual std::string *GenerateWebData(void) = 0;
+    virtual void AppendWebData(std::string &str) = 0;
     virtual void ProcessWebCommand(ESP8266WebServer *pWebServer) = 0;
     virtual void PublishMqttState(PubSubClient &mqttClient) = 0;
     virtual bool ProcessMqttCommand(char* message) = 0;
@@ -58,6 +58,9 @@ class GenericActuator {
     std::string _setTopic;
 
     private:
+    /* declare your actuator finders here. example:
+    static std::list<GenericActuator *> FindAircon(int pin);
+    */
     static std::list<GenericActuator *> FindAircon(int pin);
 };
   
