@@ -266,11 +266,12 @@ bool LocalNetwork::TryWifiConnect(void)
     return false;
 
   WiFi.mode(WIFI_OFF);
-  delay(50);
+  delay(200);
   LOG_LN("Attempting wifi connection")
   int i = 0;
   // We start by connecting to a WiFi network
   WiFi.mode(WIFI_STA);
+  delay(100);
   _pWifiMulti = new ESP8266WiFiMulti;
   _pWifiMulti->addAP(parameters.MainSsid().c_str(), parameters.MainSsidPwd().c_str());
   _pWifiMulti->addAP(parameters.BackupSsid().c_str(), parameters.BackupSsidPwd().c_str());
@@ -286,14 +287,15 @@ bool LocalNetwork::TryWifiConnect(void)
       LOG(" IP address: ")
       LOG_LN(WiFi.localIP())
 
+      // Start the mDNS responder for DEVICENAME.local
       if (!MDNS.begin(parameters.DeviceName().c_str()))
-      { // Start the mDNS responder for DEVICENAME.local
+      { 
         LOG_LN("Error setting up MDNS responder")
+      } else {
+        LOG("Device answers to ")
+        LOG(parameters.DeviceName().c_str())
+        LOG_LN(".local")
       }
-
-      LOG("Device answers to ")
-      LOG(parameters.DeviceName().c_str())
-      LOG_LN(".local")
       return true;
     }
     // Wait for the Wi-Fi to connect: scan for Wi-Fi networks, and connect to the strongest of the networks above
