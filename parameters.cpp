@@ -377,13 +377,13 @@ void Parameters::HandleConfiguration(ESP8266WebServer &webServer)
   resp.append(_mainSsid);
   resp.append("\"></div>");
   resp.append("<div><label for=\"ssid1pwd\">Main wifi pwd: </label>");
-  resp.append("<input type=\"text\" id=\"ssid1pwd\" name=\"u_ssid1pwd\"></div>");
+  resp.append("<input type=\"text\" id=\"ssid1pwd\" name=\"u_pwd1\"></div>");
   resp.append("<div><label for=\"ssid2\">Backup SSID: </label>");
   resp.append("<input type=\"text\" id=\"ssid2\" name=\"u_ssid2\" placeholder=\"");
   resp.append(_backupSsid);
   resp.append("\"></div>");
   resp.append("<div><label for=\"ssid2pwd\">Backup wifi pwd: </label>");
-  resp.append("<input type=\"text\" id=\"ssid2pwd\" name=\"u_ssid2pwd\"></div>");
+  resp.append("<input type=\"text\" id=\"ssid2pwd\" name=\"u_pwd2\"></div>");
   resp.append("<div><BR><input type=\"submit\"></div></form>");
   
   resp.append("<BR><HR align=center size=1 width=\"75%\"><H2 align=center>Mqtt parameters</H2><BR>");
